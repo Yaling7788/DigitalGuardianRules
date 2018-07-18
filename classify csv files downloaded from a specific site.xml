@@ -1,0 +1,98 @@
+The purpose of this rule is to classify csv files downloaded from a specific site.
+ 
+Classification rule:
+<and>
+    <set>
+        <varstring name="Var-CheckpointA-Classification-TraxInsight" scope="event"/>
+        <varstring name="Var-Files_That_Need_To_Be_Classified_TraxInsight" scope="srcFile"/>
+    </set>
+    <equal>
+        <varstring name="Var-Files_That_Need_To_Be_Classified_TraxInsight" scope="srcFile"/>
+        <evtSrcFilePath/>
+    </equal>
+</and>
+ 
+Control rule:
+<or>
+    <and>
+        <!--Add the files to a classification array-->
+        <add asArray="true">
+            <varstring name="Var-Files_That_Need_To_Be_Classified_TraxInsight" scope="srcFile"/>
+            <evtSrcFilePath/>
+        </add>
+        <like expr="%traxinsight.com%">
+            <varstring name="Var-curProcessAddressBar-TraxInsightTracking" scope="process"/>
+        </like>
+        <equal>
+            <evtSrcFileExt/>
+            <string value="csv"/>
+        </equal>
+        <equal>
+            <evtOperationType/>
+            <constOpFileWrite/>
+        </equal>
+        <in>
+            <curProcessImageName/>
+            <list>
+                <string value="chrome.exe"/>
+                <string value="firefox.exe"/>
+                <string value="iexplore.exe"/>
+                <string value="safari.exe"/>
+                <string value="edge.exe"/>
+            </list>
+        </in>
+    </and>
+    <and>
+        <equal>
+            <bool value="true"/>
+            <bool value="false"/>
+        </equal>
+        <!--****************************************************************-->
+        <!--Track the address for each site visited (Once Per Site)-->
+        <!--****************************************************************-->
+        <set>
+            <varstring name="Var-curProcessAddressBar-TraxInsightTracking" preserveCase="true" scope="process"/>
+            <curProcessAddressBar/>
+        </set>
+        <not>
+            <in match="all">
+                <curProcessAddressBar/>
+                <list>
+                    <varstring name="Var-curProcessAddressBar-TraxInsightTracking" scope="process"/>
+                </list>
+            </in>
+        </not>
+        <!--****************************************************************-->
+        <!--Filter Out Noisy Operations-->
+        <!--****************************************************************-->
+        <not>
+            <equal>
+                <string value="about:blank"/>
+                <curProcessAddressBar/>
+            </equal>
+        </not>
+        <not>
+            <equal>
+                <string value="about:tabs"/>
+                <curProcessAddressBar/>
+           </equal>
+        </not>
+        <regExp expr="[a-z0-9]">
+            <curProcessAddressBar/>
+        </regExp>
+        <!--****************************************************************-->
+        <!--By Browser Applications Only-->
+        <!--****************************************************************-->
+        <in>
+            <curProcessImageName/>
+            <list>
+                <string value="iexplore.exe"/>
+                <string value="edge.exe"/>
+                <string value="chrome.exe"/>
+                <string value="firefox.exe"/>
+            </list>
+        </in>
+    </and>
+</or>
+ 
+This control rule is set to Action=Continue and Send Alert=No (Events only).
