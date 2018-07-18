@@ -1,0 +1,25 @@
+One alternative approach is to target the Netops with specific URLs found in evtUrlPath. For example this rule blocks you from downloading executables off https://www.7-zip.org/download.html
+ 
+<and>
+  <in op="like">
+    <evtUrlPath/>
+    <list>
+      <string value="%.exe"/>
+      <string value="%.msi"/>
+      <string value="%.zip"/>
+      <string value="%.7z"/>
+      <string value="%.rar"/>
+    </list>
+  </in>
+  <in>
+    <evtOperationType/>
+    <list>
+      <constOpNetwork/>
+      <constOpNetworkEx/>
+    </list>
+  </in>
+</and>
+ 
+You can target the web site address in evtUrlPath if you want, too.
+ 
+Remember that NetOp rules cannot have a Prompt action; we could potentially have a CustomEvent throw a Prompt.

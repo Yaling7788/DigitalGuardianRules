@@ -1,0 +1,61 @@
+Example with 7zip website:
+Classification Rule:
+  <equal><varbool name="filetotagX" scope="srcFile"/><bool value="true"/></equal>
+ 
+ 
+Control Rule:
+<and>
+  <add><varstring name="CustomRuleData" scope="event"/><curProcessAddressBar/></add>
+  <set><varbool name="filetotagX" scope="destFile"/><bool value="true"/></set>
+<not>
+    <in op="like">
+      <evtSrcFileExt/>
+      <list>
+        <string value="db"/>
+        <string value="tmp"/>       
+        <string value="partial"/>        
+        <string value="crdownload"/>
+        <string value=""/>                
+      </list>
+    </in>
+</not> 
+<not>
+    <in op="like">
+      <evtSrcFilePath/>
+      <list>
+        <string value="%.db"/>
+        <string value="%.crdownload"/>
+        <string value="%.tmp"/>       
+        <string value="%.partial"/> 
+        <string value="%\appdata\roaming\%"/>
+        <string value="%\appdata\local\%"/>       
+        <string value="%\appdata\locallow\%"/>               
+      </list>
+    </in>
+</not> 
+  <in op="like">
+    <curProcessAddressBar/>
+    <list>
+      <string value="%7-zip.org%"/>
+    </list>
+  </in>
+  <in>
+    <evtOperationType />
+    <list>
+      <constOpNetTransferDownload />
+      <constOpFileSaveAs />
+      <constOpFileWrite />    
+      <constOpFileRename />          
+    </list>
+  </in>   
+  <in op="like">
+      <curProcessImageName/>
+      <list>
+        <string value="iexplore.exe"/>
+        <string value="chrome.exe"/>
+        <string value="firefox.exe"/>
+        <string value="microsoftedge.exe"/>
+        <string value="microsoftedgecp.exe"/>      
+      </list>
+    </in>
+</and>
